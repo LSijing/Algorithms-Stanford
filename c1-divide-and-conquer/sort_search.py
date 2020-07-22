@@ -1,88 +1,103 @@
 # -*- coding: utf-8 -*-
 
-import numpy as np
-from merge_sort_count_inversions import merge_sort_count_inversion
+"""
+quick sort, count number of comparisons in it.
+linear time search the k-th smallest element in an unsorted array.
+"""
+import math
+import random
 import copy
 
-def quick_sort(a,n):
+def quick_sort(a,start,end,pivot='r'):
+    """
+    a[start],a[end] included
+    pivot == 
+    'r' random pivot
+    'first' first element, a[start]
+    'last' last element, a[end]
+    'med' median of a[start],a[end],a[(start+end)//2]
+    """
     # base case
-    if n==1 or n==0:
-        return a, 0
-    if n==2:
-        if a[0]>a[1]:
-            a[[0,1]] = a[[1,0]]
+    n = end + 1 - start
+    if n <= 1: return a, 0
+    if n == 2:
+        if a[start] > a[end]:
+            a[start], a[end] = a[end], a[start]
         return a, 1
     
     # define pivot
-#    p = int(np.random.randint(n, size=1))
-    med = list( sorted( [0,(n-1)//2, n-1] , key = lambda i:a[i] ) )
-    p = med[1]
-#    p = n-1
+    if pivot == 'first':
+        p = start
+    elif pivot == 'last':
+        p = end
+    elif pivot == 'med':
+        p_s = list(sorted( [start, (start+end)//2, end], key= lambda i:a[i]))
+        p = p_s[1]
+    else:
+        p = random.randint(start,end)
+            
     v = a[p]
-    a[[0,p]] = a[[p,0]]
+    a[start], a[p] = a[p], a[start]
     
     # partition
-    i = 1
-    for j in range(1,n):
+    i = start + 1
+    for j in range(start+1,end+1):
         if a[j] < v:
-            a[[i,j]] = a[[j,i]]
+            a[i], a[j] = a[j], a[i]
             i += 1
-    a[[0,i-1]] = a[[i-1,0]]
+    a[start], a[i-1] = a[i-1], a[start]
     
     # subroutine
-    a[0:i-1], cl = quick_sort(a[0:i-1], i-1)
-    a[i:], cr = quick_sort(a[i:], n-i)
+    _, cl = quick_sort(a, start, i-2, pivot)
+    _, cr = quick_sort(a, i, end, pivot)
     
     # sorted array, number of comparisons
     return a, cl+cr+n-1
     
     
-def linear_search(a,idx,n):
+def linear_search(a,start,end,idx):
+    n = end + 1 - start
     # base case
-    if n==1:
-        return a[0], 0
+    if n == 1: return start, 0
     
     # define pivot
-    p = int(np.random.randint(n, size=1))
+    p = random.randint(start,end)
     v = a[p]
-    a[[0,p]] = a[[p,0]]
+    a[start], a[p] = a[p], a[start]
     
     # partition
-    i = 1
-    for j in range(1,n):
+    i = start + 1
+    for j in range(start+1,end+1):
         if a[j] < v:
-            a[[i,j]] = a[[j,i]]
+            a[i], a[j] = a[j], a[i]
             i += 1
-    a[[0,i-1]] = a[[i-1,0]]
+    a[start], a[i-1] = a[i-1], a[start]
     
-    if idx==i-1:
-        return v, n-1
-    if idx < i-1:
-        sol, cl = linear_search(a[0:i-1], idx, i-1)
-        return sol, cl+n-1
-    if i-1 < idx:
-        sol, cr = linear_search(a[i:], idx-i, n-i)
-        return sol, cr+n-1
+    if idx == i - start:
+        return i-1, n-1
+    if idx < i - start:
+        pos, cl = linear_search(a, start, i-2, idx)
+        return pos, cl+n-1
+    if i - start < idx:
+        pos, cr = linear_search(a, i, end, idx-i+start)
+        return pos, cr+n-1
     
     
 
 
 if __name__ == '__main__':
-    f = open('data/QuickSort.txt', mode='r')
-    data = f.readlines()
-    f.close()
-    x = np.zeros((len(data)))
-    for i in range(len(data)):
-        x[i] = int(data[i])
-    
-    xorigin = copy.copy(x)
-    y1, n = merge_sort_count_inversion(x)
-    y2, num_compare = quick_sort(x, x.size)
-    
-    print(x.size, int(x.size * np.log2(x.size)), num_compare)
+    #random.seed(10)
+    n = 100000
+    x = [random.randint(0,n) for i in range(n)]
+    y = copy.copy(x)
+    _, num_compare = quick_sort(x, 0,len(x)-1, 'med')
+    print( sorted(y)==x, int(len(x) * math.log2(len(x))), num_compare/len(x)/math.log2(len(x)) )
 
-    for i in range(10):
-        idx = int(np.random.randint(x.size))
-        x = copy.copy(xorigin)
-        value, num_compare = linear_search(x, idx, x.size)
-        print(idx+1,value, num_compare/x.size)
+    for i in range(5):
+        idx = random.randint(1,len(x))
+        x = [random.randint(0,n) for i in range(n)]
+        y = copy.copy(x)
+        i, num_compare = linear_search(x,0,len(x)-1,idx)
+        value = x[i]
+        stat = sorted(y)[idx-1]
+        print(stat==value, num_compare/len(x))

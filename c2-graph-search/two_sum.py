@@ -1,51 +1,41 @@
 # -*- coding: utf-8 -*-
+"""
+two sum, 
+given: an array a, interval [a,b],
+goal: count the number of two-sums falling in [a,b] in linear time.
+"""
 
-
-
-import numpy as np
-
-
-
-if __name__ == '__main__':
-    a,b = -10000, 10000
-    num_file = '60_160000'
-#    f = open('stanford-algs-master/testCases/course2/assignment4TwoSum/input_random_'+num_file+'.txt')
-#    output = open('stanford-algs-master/testCases/course2/assignment4TwoSum/output_random_'+num_file+'.txt')
-    f = open('data/2sum.txt')
-    data = f.readlines()
+def two_sum(arr, a,b):
     qualified = [False for i in range(b-a+1)]
-    # create hash table (quotient,remainders list)
     dic = dict()
-    for idx,s in enumerate(data):
-        x = int(s) - a
+    for elem in arr:
+        x = elem - a
         q, r = x // (b-a+1), x % (b-a+1)
         if q in dic:
             dic[q].append(r)
         else:
             dic[q] = [r]
-        
-    # enumerate data
-    for idx,s in enumerate(data):
-        x = int(s)
-        q,r = x // (b-a+1), x % (b-a+1)
-        if -1-q in dic:
-            for idx,r2 in enumerate(dic[-1-q]):
-                res = (b-a+1) * -1 + r + r2
-                if res >= 0 and res <= (b-a):
-                    qualified[res] = True
-        if -q in dic:
-            for idx,r2 in enumerate(dic[-q]):
-                res = r+r2
-                if res >= 0 and res <= (b-a):
-                    qualified[res] = True
-                    
     
-    t = 0 
-    for i in range(len(qualified)):
-        if qualified[i]:
-            t += 1
+    for y in arr:
+        q, r = y // (b-a+1), y % (b-a+1)
+        if -1-q in dic:
+            for rx in dic[-1-q]:
+                twosum = -(b-a+1) + r + rx
+                if twosum >= 0 and twosum <= b-a: qualified[twosum] = True
+        if -q in dic:
+            for rx in dic[-q]:
+                twosum = r + rx
+                if twosum >= 0 and twosum <= b-a: qualified[twosum] = True
+                
+    c = len([i for i in qualified if i])
+    return c
+    
+
+if __name__ == '__main__':
+    import random
+    a,b = -10000, 10000
+    M = 10 ** 13
+    n = 640000
+    arr = [random.randint(-M,M) for i in range(n)]
+    t = two_sum(arr, a, b)
     print(t)
-#    print(t,output.readlines())
-        
-#    for i,(k,v) in enumerate(dic.items()):
-#        print(k*(b-a+1)+v[0] + a - int(data[i]))
