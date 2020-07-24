@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Huffman code
+"""
 
-
-from mst import MinHeap
-
-
+from data_structures import MinHeap
 
 def huffmancode(weight):
     heap = MinHeap()
@@ -24,24 +24,3 @@ def huffmancode(weight):
     
     return min(depth), max(depth)
 
-
-
-
-
-if __name__ == '__main__':
-#    num_file = '46_10000'
-#    f = open('stanford-algs-master/testCases/course3/assignment3HuffmanAndMWIS/question1And2/input_random_'+num_file+'.txt')
-#    output = open('stanford-algs-master/testCases/course3/assignment3HuffmanAndMWIS/question1And2/output_random_'+num_file+'.txt').readlines()
-    f = open('data/huffman.txt')
-    n = int(f.readline())
-    weight = []
-    for i in range(n):
-        data = f.readline()
-        
-        w = float(data)
-        weight.append(float(w))
-        
-    xiao,da = huffmancode(weight)
-    
-    print(da,xiao)
-    
